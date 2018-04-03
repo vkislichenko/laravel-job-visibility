@@ -1,0 +1,27 @@
+{
+  "name": "tochka-developers/laravel-job-visibility",
+  "description": "Make job instance visibility in queue events",
+  "type": "package",
+  "authors": [
+    {
+      "name": "Babushkin Pavel",
+      "email": "darkdarin@tochka.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Tochka\\Queue\\JobVisibility\\": "src/"
+    }
+  },
+  "require": {
+    "php": ">=7.0.0",
+    "laravel/framework": ">=5.4"
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Tochka\\Queue\\JobVisibility\\JobVisibilityServiceProvider"
+      ]
+    }
+  }
+}
