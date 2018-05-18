@@ -5,13 +5,9 @@ namespace Tochka\Queue\JobVisibility;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Queue\CallQueuedHandler as BaseHandler;
-use Tochka\Queue\JobVisibility\Contracts\JobReturner;
 
-class CallQueuedHandler extends BaseHandler implements JobReturner
+class CallQueuedHandler extends BaseHandler
 {
-
-    protected $command;
-
     /**
      * Handle the queued job.
      *
@@ -23,28 +19,27 @@ class CallQueuedHandler extends BaseHandler implements JobReturner
     public function call(Job $job, array $data)
     {
         try {
-            $this->command = $this->setJobInstanceIfNecessary(
+            $command = $this->setJobInstanceIfNecessary(
                 $job, unserialize($data['command'])
             );
         } catch (ModelNotFoundException $e) {
             return $this->handleModelNotFound($job, $e);
         }
 
-        $this->dispatcher->dispatchNow(
-            $this->command, $this->resolveHandler($job, $this->command)
-        );
+        try {
+            $this->dispatcher->dispatchNow($command, $this->resolveHandler($job, $command));
+        } catch (\Exception $e) {
+            throw $e;
+        } finally {
+            app()->instance('QueueCurrentJob', $command);
+        }
 
         if (!$job->hasFailed() && !$job->isReleased()) {
-            $this->ensureNextJobInChainIsDispatched($this->command);
+            $this->ensureNextJobInChainIsDispatched($command);
         }
 
         if (!$job->isDeletedOrReleased()) {
             $job->delete();
         }
-    }
-
-    public function getJob()
-    {
-        return $this->command;
     }
 }
