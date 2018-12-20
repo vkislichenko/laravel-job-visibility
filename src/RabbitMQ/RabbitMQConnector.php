@@ -1,6 +1,6 @@
 <?php
 
-namespace Tochka\Queue\JobVisibility\RabbitMq;
+namespace Tochka\Queue\JobVisibility\RabbitMQ;
 
 use Enqueue\AmqpTools\DelayStrategyAware;
 use Enqueue\AmqpTools\RabbitMqDlxDelayStrategy;
@@ -10,9 +10,9 @@ use Illuminate\Queue\Events\WorkerStopping;
 use Interop\Amqp\AmqpConnectionFactory;
 use Interop\Amqp\AmqpConnectionFactory as InteropAmqpConnectionFactory;
 use Interop\Amqp\AmqpContext;
-use VladimirYuldashev\LaravelQueueRabbitMQ\Queue\Connectors\RabbitMqConnector as BaseConnector;
+use VladimirYuldashev\LaravelQueueRabbitMQ\Queue\Connectors\RabbitMQConnector as BaseConnector;
 
-class RabbitMqConnector extends BaseConnector
+class RabbitMQConnector extends BaseConnector
 {
 
     /**

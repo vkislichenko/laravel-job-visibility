@@ -6,17 +6,24 @@ use Illuminate\Queue\QueueManager;
 use Illuminate\Support\ServiceProvider;
 use Tochka\Queue\JobVisibility\Database\DatabaseConnector;
 use Tochka\Queue\JobVisibility\Horizon\RedisConnector as HorizonConnector;
-use Tochka\Queue\JobVisibility\RabbitMq\RabbitMqConnector;
+use Tochka\Queue\JobVisibility\RabbitMQ\RabbitMQConnector;
 use Tochka\Queue\JobVisibility\Redis\RedisConnector;
 
 class JobVisibilityServiceProvider extends ServiceProvider
 {
+    public function register()
+    {
+        $this->app->booted(function() {
+            $this->bootAfterAll();
+        });
+    }
+
     /**
      * Bootstrap any application services.
      *
      * @return void
      */
-    public function boot()
+    public function bootAfterAll()
     {
         /** @var QueueManager $queue */
         $queue = app('queue');
@@ -29,7 +36,7 @@ class JobVisibilityServiceProvider extends ServiceProvider
         // Add RabbitMq Connector
         if (!empty($this->app->getProviders('VladimirYuldashev\LaravelQueueRabbitMQ\LaravelQueueRabbitMQServiceProvider'))) {
             $queue->addConnector('rabbitmq', function () {
-                return new RabbitMqConnector($this->app['events']);
+                return new RabbitMQConnector($this->app['events']);
             });
         }
 
