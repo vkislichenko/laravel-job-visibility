@@ -2,6 +2,7 @@
 
 namespace Tochka\Queue\JobVisibility;
 
+use Illuminate\Queue\Queue;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Support\ServiceProvider;
 use Tochka\Queue\JobVisibility\Database\DatabaseConnector;
@@ -11,11 +12,21 @@ use Tochka\Queue\JobVisibility\Redis\RedisConnector;
 
 class JobVisibilityServiceProvider extends ServiceProvider
 {
-    public function register()
+    public function register(): void
     {
-        $this->app->booted(function() {
-            $this->bootAfterAll();
-        });
+        if (version_compare(app()->version(), '5.7.7', '>=')) {
+            Queue::createPayloadUsing(function ($connection, $queue, $payload) {
+                if (isset($payload['job'])) {
+                    return ['job' => CallQueuedHandler::class . '@call'];
+                }
+
+                return [];
+            });
+        } else {
+            $this->app->booted(function () {
+                $this->bootAfterAll();
+            });
+        }
     }
 
     /**
@@ -23,7 +34,7 @@ class JobVisibilityServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function bootAfterAll()
+    public function bootAfterAll(): void
     {
         /** @var QueueManager $queue */
         $queue = app('queue');
