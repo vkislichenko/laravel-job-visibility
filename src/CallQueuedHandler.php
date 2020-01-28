@@ -30,6 +30,7 @@ class CallQueuedHandler extends BaseHandler
         }
 
         try {
+            app()->instance('QueueCurrentJob', $command);
             $this->dispatcher->dispatchNow($command, $this->resolveHandler($job, $command));
         } catch (\Exception $e) {
             if ($command instanceof ErrorHandler) {
